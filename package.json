@@ -1,0 +1,21 @@
+{
+  "name": "bienes-raices-sena",
+  "version": "1.0.0",
+  "description": "Proyecto de Bienes Raices ",
+  "license": "ISC",
+  "author": "Jose Angel Mejia Medina",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
