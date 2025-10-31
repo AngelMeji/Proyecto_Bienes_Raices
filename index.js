@@ -8,10 +8,14 @@ const app = express();
 // Conexion a DB
 try {
     await db.authenticate();
+    db.sync();
     console.log("La conexion es correcta a la db");
 } catch (error) {
     console.error("No se puede conectar", error);
 }
+
+//Habilitar Letura de Formularios
+app.use(express.urlencoded({extended: true}));
 
 //Habilitar pug
 app.set("view engine", "pug"); 

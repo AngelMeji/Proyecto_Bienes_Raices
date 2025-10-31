@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "../config/db";
-import { data } from "autoprefixer";
+import db from "../config/db.js";
 
 const Usuario = db.define("usuarios", {
     nombre:{
