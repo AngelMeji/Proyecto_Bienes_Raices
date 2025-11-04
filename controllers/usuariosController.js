@@ -1,6 +1,5 @@
 import { check, validationResult } from "express-validator";
 import Usuario from "../models/Usarios.js";
-import { where } from "sequelize";
 
 const formularioLogin = (req, res) => {
     res.render("auth/login", {
@@ -54,7 +53,12 @@ const registrar = async (req, res) => {
         });
     }
 
-    const usuarios = await Usuario.create(req.body); 
+    const usuarios = await Usuario.create({
+        nombre,
+        email,
+        password,
+        token: 123,
+    }); 
     res.json(req.body);
 };
 
