@@ -1,6 +1,6 @@
 import { check, validationResult } from "express-validator";
 import bcrypt from "bcrypt";
-import { generarJWT, generarId } from "../helpers/tokens.js";
+import { generarId, generarJWT } from "../helpers/tokens.js";
 import Usuario from "../models/Usuarios.js";
 import { emailRegistro, emailOlvidePassword } from "../helpers/emails.js";
 
@@ -35,9 +35,9 @@ const autenticar = async (req, res) => {
     });
   }
 
-  //Comprobar si existe
-  const { email, password} = req.body;
+  const { email, password } = req.body;
 
+  // Comprobar si existe
   const usuario = await Usuario.findOne({
     where: { email },
   });
@@ -48,10 +48,10 @@ const autenticar = async (req, res) => {
       csrfToken: req.csrfToken(),
       errores: [{ msg: "El usuario no existe" }],
     });
-  };
+  }
 
   //Comprobar si el usuario esta confirmado (TRUE)
-  if(!usuario.confirmado) {
+  if (!usuario.confirmado) {
     return res.render("auth/login", {
       tituloPagina: "Iniciar Sesion",
       csrfToken: req.csrfToken(),
@@ -59,26 +59,26 @@ const autenticar = async (req, res) => {
     });
   }
 
-  //Comprobar Contraseña
-  if(!usuario.verificarPassword(password)){
+  // Comprobar contraseña
+  if (!usuario.verificarPassword(password)) {
     return res.render("auth/login", {
       tituloPagina: "Iniciar Sesion",
       csrfToken: req.csrfToken(),
       errores: [{ msg: "Contraseña incorrecta" }],
     });
-  };
+  }
 
   // Autenticar el Usuario
   const token = generarJWT({ id: usuario.id, nombre: usuario.nombre });
-  console.log(token);
 
-  // Amacenar n una cookie
-  return res.cookie("_token", token, {
-    httpOnly: true,
-    // secure: true,
-    // sameSite: true,
-  })
-  .redirect("/mis-propiedades");
+  // Almacenar en una Cookie
+  return res
+    .cookie("_token", token, {
+      httpOnly: true,
+      // secure: true,
+      // sameSite: true
+    })
+    .redirect("/mis-propiedades");
 };
 
 const formularioRegistro = (req, res) => {

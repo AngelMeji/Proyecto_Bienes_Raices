@@ -35,7 +35,7 @@ app.use(express.static("public"));
 
 // Routing
 app.use("/auth", usuarioRoutes);
-app.use("", propiedadesRoutes);
+app.use("/", propiedadesRoutes);
 
 // Definir el puerto
 const port = process.env.PORT || 3000;

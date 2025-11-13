@@ -6,7 +6,7 @@ const admin = (req, res) => {
   });
 };
 
-const crear =(req, res) => {
+const crear = (req, res) => {
   res.render("propiedades/crear", {
     tituloPagina: "Crear una nueva propiedad",
     csrfToken: req.csrfToken(),
