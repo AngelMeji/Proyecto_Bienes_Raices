@@ -6,5 +6,6 @@ const router = express.Router();
 // Mis propidades
 router.get("/mis-propiedades", admin);
 router.get("/propiedades/crear", crear);
+router.post("/propiedades/crear", crear);
 
 export default router;
