@@ -1,7 +1,5 @@
+import {Propiedades, Precios, Categorias, Usuarios} from "../models/index.js";
 import { check, validationResult } from "express-validator";
-import Propiedades from "../models/Propiedades.js";
-import Categorias from "../models/Categorias.js";
-import Precios from "../models/Precios.js";
 
 const admin = (req, res) => {
   res.render("propiedades/admin", {
@@ -15,18 +13,24 @@ const crear = async (req, res) => {
   const [categorias, precios] = await Promise.all([
     Categorias.findAll(),
     Precios.findAll(),
-  ])
+  ]);
 
   res.render("propiedades/crear", {
     tituloPagina: "Crear una nueva propiedad",
     csrfToken: req.csrfToken(),
     categorias,
     precios,
+    datos: req.body,
     headerAdmin: true,
   });
 };
 
-const crearPropiedad = async (req, res) => {
+const guardar = async (req, res) => {
+  const [categorias, precios] = await Promise.all([
+    Categorias.findAll(),
+    Precios.findAll(),
+  ]);
+
   //Validaciones
   await check("titulo")
     .notEmpty()
@@ -74,7 +78,6 @@ const crearPropiedad = async (req, res) => {
     .isInt()
     .withMessage("No se han seleccionado baños")
     .run(req);
-
   let resultado = validationResult(req);
 
   // Verificar que el resultado este vacio
@@ -82,13 +85,14 @@ const crearPropiedad = async (req, res) => {
     // Errores
     return res.render("propiedades/crear", {
       tituloPagina: "Crear Propiedad",
-      csrfToken: req.csrfToken(),
-      headerAdmin: true,
       errores: resultado.array(),
+      csrfToken: req.csrfToken(),
+      categorias,
+      precios,
       datos: req.body,
     });
   }
   console.log("Enviando...");
 };
 
-export { admin, crear, crearPropiedad };
+export { admin, crear, guardar };
