@@ -1,4 +1,5 @@
 import { check, validationResult } from "express-validator";
+import Propiedades from "../models/Propiedades.js";
 
 const admin = (req, res) => {
   res.render("propiedades/admin", {
@@ -13,6 +14,7 @@ const crear = (req, res) => {
     tituloPagina: "Crear una nueva propiedad",
     csrfToken: req.csrfToken(),
     headerAdmin: true,
+    datos: {}
   });
 };
 
@@ -25,17 +27,44 @@ const crearPropiedad = async (req, res) => {
 
   await check("descripcion")
     .notEmpty()
-    .withMessage("El descripción no puede estar vacia")
+    .withMessage("La descripción es obligatoria")
+    .isLength({ min: 20 })
+    .withMessage("La descripción debe tener al menos 20 caracteres")
     .run(req);
 
   await check("categoria")
-    .equals(2)
-    .withMessage("Lacategoria no puede estar vacia")
+    .notEmpty()
+    .withMessage("La categoría es obligatoria")
+    .isInt()
+    .withMessage("La categoría no es válida")
     .run(req);
 
   await check("precio")
-    .equals(2)
-    .withMessage("El precio no puede estar vacio")
+    .notEmpty()
+    .withMessage("El precio es obligatorio")
+    .isInt()
+    .withMessage("El precio no es válido")
+    .run(req);
+
+  await check("habitaciones")
+    .notEmpty()
+    .withMessage("Las habitaciones son obligatorias")
+    .isInt()
+    .withMessage("No se han seleccionado habitaciones")
+    .run(req);
+
+  await check("parqueaderos")
+    .notEmpty()
+    .withMessage("Los parqueaderos son obligatorios")
+    .isInt()
+    .withMessage("No se han seleccionado parqueaderos")
+    .run(req);
+
+  await check("wc")
+    .notEmpty()
+    .withMessage("Los baños son obligatorios")
+    .isInt()
+    .withMessage("No se han seleccionado baños")
     .run(req);
 
   let resultado = validationResult(req);
@@ -43,12 +72,15 @@ const crearPropiedad = async (req, res) => {
   // Verificar que el resultado este vacio
   if (!resultado.isEmpty()) {
     // Errores
-    return res.render("/propiedades/crear", {
-      tituloPagina: "Crear Categoria",
-      errores: resultado.array(),
+    return res.render("propiedades/crear", {
+      tituloPagina: "Crear Propiedad",
       csrfToken: req.csrfToken(),
+      headerAdmin: true,
+      errores: resultado.array(),
+      datos: req.body,
     });
   }
+  console.log("Enviando...");
 };
 
-export { admin, crear };
+export { admin, crear, crearPropiedad };
