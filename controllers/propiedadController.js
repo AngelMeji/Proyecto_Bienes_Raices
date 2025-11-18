@@ -1,5 +1,7 @@
 import { check, validationResult } from "express-validator";
 import Propiedades from "../models/Propiedades.js";
+import Categorias from "../models/Categorias.js";
+import Precios from "../models/Precios.js";
 
 const admin = (req, res) => {
   res.render("propiedades/admin", {
@@ -9,12 +11,18 @@ const admin = (req, res) => {
   });
 };
 
-const crear = (req, res) => {
+const crear = async (req, res) => {
+  const [categorias, precios] = await Promise.all([
+    Categorias.findAll(),
+    Precios.findAll(),
+  ])
+
   res.render("propiedades/crear", {
     tituloPagina: "Crear una nueva propiedad",
     csrfToken: req.csrfToken(),
+    categorias,
+    precios,
     headerAdmin: true,
-    datos: {}
   });
 };
 

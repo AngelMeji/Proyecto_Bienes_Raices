@@ -32,14 +32,18 @@ block contenido
                         div(class="md:w-1/2")
                             label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="categoria") Categoria
                             select#categoria.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="categoria")
-                                    option(value="") CATEGORIA
-                                    option(value="2") habitacion
+                                    option(value="") - Seleccionar una opcion -
+                                    each categoria in categorias 
+                                        //option(value=categoria.id selected= datos.categoria ? datos.categoria == categoria.id ? true: false: null)= categoria.nombre
+                                        option(value=categoria.id)= categoria.nombre
 
                         div(class="md:w-1/2")
                             label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="precio") Precio
                             select#precio.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(name="precio")
-                                    option(value="") PRECIO
-                                    option(value="2") PRECIO2
+                                    option(value="") - Seleccionar una opcion -
+                                    each precio in precios
+                                        //option(value=precio.id selected= datos.precio ? datos.precio == precio.id ? true: false: null)= precio.nombre
+                                        option(value=precio.id)= precio.nombre
 
                     div(class="md:flex md:gap-4 space-y-5 md:space-y-0")
                             div(class="md:w-1/3")
