@@ -88,4 +88,12 @@ const guardar = async (req, res) => {
   }
 };
 
-export { admin, crear, guardar };
+const agregarImagenes = (req, res) => {
+  res.render("propiedades/agregar-imagen", {
+    tituloPagina: "Mis propiedades",
+    csrfToken: req.csrfToken(),
+    headerAdmin: true,
+  });
+};
+
+export { admin, crear, guardar, agregarImagenes };
