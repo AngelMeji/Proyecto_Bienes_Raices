@@ -1,31 +1,30 @@
-import jwt from 'jsonwebtoken';
-import Usuario from '../models/Usuarios.js';
+import jwt from "jsonwebtoken";
+import { Usuarios } from "../models/index.js";
 
 const protegerRuta = async (req, res, next) => {
-    const { _token } = req.cookies;
-
-    if (!_token) {
-        return res.redirect('/auth/login');
+  // Verificar si hay un token
+  const { _token } = req.cookies;
+  if (!_token) {
+    return res.redirect("/auth/login");
+  }
+  // Validar el token
+  try {
+    const decoded = jwt.verify(_token, process.env.JWT_SECRET);
+    const usuario = await Usuarios.scope("eliminarPassword").findByPk(
+      decoded.id
+    );
+    console.log(usuario);
+    // Almacenar el usuario al REQ
+    if (usuario) {
+      req.usuario = usuario;
+    } else {
+      return res.redirect("/auth/login");
     }
-    try {
-        const verificarToken = jwt.verify(_token, process.env.JWT_SECRET);
-
-        // Buscamos los usuarios
-        const usuario = await Usuario.findByPk(verificarToken.id);
-
-        if (!usuario) {
-            return res.redirect('/auth/login');
-        }
-
-        // Guardamos el usuario en req
-        req.usuario = usuario;
-
-        return next();
-
-    } catch (error) {
-        console.log("JWT inválido o expirado:", error);
-        return res.redirect('/auth/login');
-    }
+    return next();
+  } catch (error) {
+    console.log("JWT inválido o expirado:", error);
+    return res.clearCookie("_token").redirect("/auth/login");
+  }
 };
 
 export default protegerRuta;
