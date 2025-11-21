@@ -2,7 +2,7 @@ import { exit } from "node:process";
 import categoria from "./categoria.js";
 import precio from "./precio.js";
 import usuario from "./usuario.js";
-import {Categorias, Precios, Usuarios} from "../models/index.js";
+import { Categorias, Precios, Usuarios } from "../models/index.js";
 import db from "../config/db.js";
 
 const importarDatos = async () => {

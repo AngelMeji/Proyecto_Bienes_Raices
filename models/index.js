@@ -3,8 +3,8 @@ import Precios from "./Precios.js";
 import Categorias from "./Categorias.js";
 import Usuarios from "./Usuarios.js";
 
-Propiedades.belongsTo(Precios, { foreignKey: "preciosId" });
-Propiedades.belongsTo(Categorias, { foreignKey: "categoriasId" });
-Propiedades.belongsTo(Usuarios, { foreignKey: "usuarioId" });
+Propiedades.belongsTo(Precios, { ForeignKey: "preciosId" });
+Propiedades.belongsTo(Categorias, { ForeignKey: "categoriasId" });
+Propiedades.belongsTo(Usuarios, { ForeignKey: "UsuarioId" });
 
-export { Propiedades, Precios, Categorias, Usuarios};
+export { Propiedades, Precios, Categorias, Usuarios };

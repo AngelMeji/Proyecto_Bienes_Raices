@@ -5,7 +5,6 @@ const admin = (req, res) => {
   res.render("propiedades/admin", {
     tituloPagina: "Mis propiedades",
     csrfToken: req.csrfToken(),
-    headerAdmin: true,
   });
 };
 
@@ -21,7 +20,6 @@ const crear = async (req, res) => {
     csrfToken: req.csrfToken(),
     categorias,
     precios,
-    headerAdmin: true,
     datos: {},
   });
 };
@@ -88,12 +86,13 @@ const guardar = async (req, res) => {
   }
 };
 
-const agregarImagenes = (req, res) => {
+const agregarImagen = async (req, res) => {
   res.render("propiedades/agregar-imagen", {
-    tituloPagina: "Mis propiedades",
+    tituloPagina: "Agregar una imagen",
     csrfToken: req.csrfToken(),
-    headerAdmin: true,
   });
+
+  console.log(req.params);
 };
 
-export { admin, crear, guardar, agregarImagenes };
+export { admin, crear, guardar, agregarImagen };

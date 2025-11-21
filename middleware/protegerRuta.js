@@ -22,7 +22,6 @@ const protegerRuta = async (req, res, next) => {
     }
     return next();
   } catch (error) {
-    console.log("JWT inválido o expirado:", error);
     return res.clearCookie("_token").redirect("/auth/login");
   }
 };
