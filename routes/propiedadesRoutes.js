@@ -2,13 +2,17 @@ import express from "express";
 import { body } from "express-validator";
 import {
   admin,
+  inicio,
   crear,
   guardar,
   agregarImagen,
   almacenarImagen,
   editar,
-  editarPropiedad,
+  guardarCambios,
   eliminar,
+  cambiarEstado,
+  editarImagen,
+  actualizarImagen,
 } from "../controllers/propiedadController.js";
 import protegerRuta from "../middleware/protegerRuta.js";
 import upload from "../middleware/subirImagen.js";
@@ -49,8 +53,10 @@ router.post(
 );
 
 router.get("/propiedades/editar/:id", protegerRuta, editar);
+
 router.post(
   "/propiedades/editar/:id",
+  protegerRuta,
   body("titulo").notEmpty().withMessage("El Titulo del Anuncio es Obligatorio"),
   body("descripcion")
     .notEmpty()
@@ -64,13 +70,23 @@ router.post(
     .withMessage("Selecciona la Cantidad de Habitaciones"),
   body("parqueaderos")
     .isNumeric()
-    .withMessage("Selecciona la Cantidad de Estacionamientos"),
+    .withMessage("Selecciona la Cantidad de Parqueaderos"),
   body("wc").isNumeric().withMessage("Selecciona la Cantidad de Baños"),
   body("lat").notEmpty().withMessage("Ubica la Propiedad en el Mapa"),
-  protegerRuta,
-  editarPropiedad
+  guardarCambios
 );
 
 router.post("/propiedades/eliminar/:id", protegerRuta, eliminar);
+router.put("/propiedades/:id", protegerRuta, cambiarEstado);
+
+router.get("/", inicio);
+
+router.get("/propiedades/editar-imagen/:id", protegerRuta, editarImagen);
+router.post(
+  "/propiedades/editar-imagen/:id",
+  protegerRuta,
+  upload.single("imagen"),
+  actualizarImagen
+);
 
 export default router;

@@ -22,15 +22,20 @@
 
       const { resultado } = await respuesta.json();
 
+      const contenedor = e.target.closest("div");
+      const btnEditarImagen = contenedor.querySelector(".btnEditarImagen");
+
       if (resultado) {
         if (e.target.classList.contains("bg-yellow-100")) {
           e.target.classList.add("bg-green-100", "text-green-800");
           e.target.classList.remove("bg-yellow-100", "text-yellow-800");
           e.target.textContent = "Publicado";
+          if(btnEditarImagen) btnEditarImagen.style.display = "none";
         } else {
           e.target.classList.remove("bg-green-100", "text-green-800");
           e.target.classList.add("bg-yellow-100", "text-yellow-800");
           e.target.textContent = "No Publicado";
+          if(btnEditarImagen) btnEditarImagen.style.display = "inline-block";
         }
       }
     } catch (error) {
