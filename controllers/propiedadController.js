@@ -1,6 +1,13 @@
 import { unlink } from "node:fs/promises";
-import { Precios, Categorias, Usuarios, Propiedades } from "../models/index.js";
+import {
+  Precios,
+  Categorias,
+  Usuarios,
+  Mensaje,
+  Propiedades,
+} from "../models/index.js";
 import { validationResult } from "express-validator";
+import { esVendedor, formatearFecha } from "../helpers/index.js";
 
 const admin = async (req, res) => {
   // Leer QueryString
@@ -40,42 +47,6 @@ const admin = async (req, res) => {
 
     res.render("propiedades/admin", {
       pagina: "Mis Propiedades",
-      propiedades,
-      csrfToken: req.csrfToken(),
-      paginas: Math.ceil(total / limit),
-      paginaActual: Number(paginaActual),
-      total,
-      offset,
-      limit,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const inicio = async (req, res) => {
-  // Leer QueryString
-  const paginaActual = Number(req.query.pagina) || 1;
-
-  try {
-    // Limites y Offset para el paginador
-    const limit = 10;
-    const offset = paginaActual * limit - limit;
-
-    const [propiedades, total] = await Promise.all([
-      Propiedades.findAll({
-        limit,
-        offset,
-        include: [
-          { model: Categorias, as: "categoria" },
-          { model: Precios, as: "precio" },
-        ],
-      }),
-      Propiedades.count(),
-    ]);
-
-    res.render("propiedades/index", {
-      pagina: "Propiedades en Venta",
       propiedades,
       csrfToken: req.csrfToken(),
       paginas: Math.ceil(total / limit),
@@ -371,68 +342,107 @@ const cambiarEstado = async (req, res) => {
   });
 };
 
-const editarImagen = async (req, res) => {
+// Muestra una propiedad
+const mostrarPropiedad = async (req, res) => {
   const { id } = req.params;
-  // Validar que la propiedad exista
-  const propiedad = await Propiedades.findByPk(id);
-  if (!propiedad) {
-    return res.redirect("/mis-propiedades");
+
+  // Comprobar que la propiedad exista
+  const propiedad = await Propiedades.findByPk(id, {
+    include: [
+      { model: Precios, as: "precio" },
+      { model: Categorias, as: "categoria", scope: "eliminarPassword" },
+    ],
+  });
+
+  if (!propiedad || !propiedad.publicado) {
+    return res.redirect("/404");
   }
 
-  // Validar si esta publicada
-  if (propiedad.publicado) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  //Validar que la propiedad sea del usuario
-  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  res.render("propiedades/editar-imagen", {
-    tituloPagina: "Agregar una nueva imagen",
-    csrfToken: req.csrfToken(),
+  res.render("propiedades/mostrar", {
     propiedad,
+    pagina: propiedad.titulo,
+    csrfToken: req.csrfToken(),
+    usuario: req.usuario,
+    esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
   });
 };
 
-const actualizarImagen = async (req, res, next) => {
+const enviarMensaje = async (req, res) => {
   const { id } = req.params;
+
+  // Comprobar que la propiedad exista
+  const propiedad = await Propiedades.findByPk(id, {
+    include: [
+      { model: Precios, as: "precio" },
+      { model: Categorias, as: "categoria" },
+    ],
+  });
+
+  if (!propiedad) {
+    return res.redirect("/404");
+  }
+
+  // Renderizar los errores
+  // Validación
+  let resultado = validationResult(req);
+
+  if (!resultado.isEmpty()) {
+    return res.render("propiedades/mostrar", {
+      propiedad,
+      pagina: propiedad.titulo,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+      errores: resultado.array(),
+    });
+  }
+  const { mensaje } = req.body;
+  const { id: propiedadId } = req.params;
+  const { id: usuarioId } = req.usuario;
+
+  // Almacenar el mensaje
+  await Mensaje.create({
+    mensaje,
+    propiedadId,
+    usuarioId,
+  });
+
+  res.redirect("/?mensaje=1");  
+};
+
+// Leer mensajes recibidos
+const verMensajes = async (req, res) => {
+  const { id } = req.params;
+
   // Validar que la propiedad exista
-  const propiedad = await Propiedades.findByPk(id);
+  const propiedad = await Propiedades.findByPk(id, {
+    include: [
+      {
+        model: Mensaje,
+        as: "mensajes",
+        include: [{ model: Usuarios.scope("eliminarPassword"), as: "usuario" }],
+      },
+    ],
+  });
+
   if (!propiedad) {
     return res.redirect("/mis-propiedades");
   }
 
-  // Validar si esta publicada
-  if (propiedad.publicado) {
+  // Revisar que quien visita la URl, es quien creo la propiedad
+  if (propiedad.usuarioId.toString() !== req.usuario.id.toString()) {
     return res.redirect("/mis-propiedades");
   }
 
-  //Validar que la propiedad sea del usuario
-  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
-    return res.redirect("/mis-propiedades");
-  }
-
-  try {
-    //Almacenar en la DB
-    await unlink(`public/uploads/${propiedad.imagen}`);
-    console.log("Archivo borrado correctamente");
-    
-    propiedad.imagen = req.file.filename;
-    propiedad.publicado = 1;
-
-    await propiedad.save();
-
-    next();
-  } catch (error) {
-    console.log(error);
-  }
+  res.render("propiedades/mensajes", {
+    pagina: "Mensajes",
+    mensajes: propiedad.mensajes,
+    formatearFecha,
+  });
 };
 
 export {
   admin,
-  inicio,
   crear,
   guardar,
   agregarImagen,
@@ -441,6 +451,7 @@ export {
   guardarCambios,
   eliminar,
   cambiarEstado,
-  editarImagen,
-  actualizarImagen,
+  mostrarPropiedad,
+  enviarMensaje,
+  verMensajes,
 };

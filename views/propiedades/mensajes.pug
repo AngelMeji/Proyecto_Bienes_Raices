@@ -1,0 +1,28 @@
+extends ../layout/app
+
+block contenido
+    div(class="py-10")
+        h1(class="text-4xl font-extrabold text-center text-gray-900 mb-10") Mensajes Recibidos
+
+        if mensajes.length === 0
+            p(class="text-center text-gray-600 mt-10 text-lg")
+                | No hay mensajes para esta propiedad
+
+        else
+            div(class="space-y-5 max-w-3xl mx-auto")
+                each mensaje in mensajes
+                    div(class="bg-white shadow rounded-lg p-5 border border-gray-200")
+                        
+                        // Texto del mensaje
+                        p(class="text-gray-900 font-bold text-sm") Mensaje:
+                        p(class="text-gray-800 mt-1")= mensaje.mensaje
+
+                        hr(class="my-4")
+
+                        // Info del usuario
+                        p(class="text-gray-900 font-bold text-sm") Enviado por:
+                        p(class="text-gray-700")= mensaje.usuario.nombre
+
+                        // Fecha formateada con tu helper
+                        p(class="text-gray-500 text-xs mt-2")
+                            | Enviado el: #{formatearFecha(mensaje.createdAt)}

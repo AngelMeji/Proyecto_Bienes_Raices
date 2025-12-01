@@ -3,10 +3,10 @@ const categoria = [
     nombre: "Casa",
   },
   {
-    nombre: "Apartamentos",
+    nombre: "Apartamento",
   },
   {
-    nombre: "Edificios",
+    nombre: "Edificio",
   },
   {
     nombre: "Finca",
